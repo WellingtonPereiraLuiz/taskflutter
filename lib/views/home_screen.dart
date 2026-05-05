@@ -6,6 +6,7 @@ import '../models/task_model.dart';
 import '../utils/app_theme.dart';
 import '../widgets/task_card.dart';
 import 'dashboard_screen.dart';
+import 'calendar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final pages = [
       _TasksPage(onAddTask: () => _openAddTaskModal(context)),
+      const CalendarScreen(),
       const DashboardScreen(),
     ];
 
@@ -64,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           onTap: (i) => setState(() => _currentIndex = i),
           backgroundColor: AppColors.surface,
-          selectedItemColor: AppColors.neonGreen,
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.textTertiary,
           type: BottomNavigationBarType.fixed,
           selectedLabelStyle: GoogleFonts.inter(
@@ -79,6 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.task_alt_rounded),
               label: 'Missões',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month_rounded),
+              label: 'Calendário',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),
@@ -174,6 +180,7 @@ class _TasksPage extends StatelessWidget {
                         ),
                     ],
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     'Suas missões do dia',
                     style: GoogleFonts.inter(
@@ -301,7 +308,7 @@ class _TasksPage extends StatelessWidget {
               _StatChip(
                 label: 'Concluídas',
                 value: vm.completedCount.toString(),
-                color: AppColors.neonGreen,
+                color: AppColors.primary,
               ),
             ],
           ),
@@ -346,7 +353,7 @@ class _TasksPage extends StatelessWidget {
                 Text(
                   'Todas as missões cumpridas!',
                   style: GoogleFonts.inter(
-                    color: AppColors.neonGreen,
+                    color: AppColors.primary,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
@@ -382,9 +389,9 @@ class _TasksPage extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: LinearProgressIndicator(
-                  backgroundColor: AppColors.neonGreen.withValues(alpha: 0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   valueColor:
-                      const AlwaysStoppedAnimation<Color>(AppColors.neonGreen),
+                      const AlwaysStoppedAnimation<Color>(AppColors.primary),
                   minHeight: 2,
                 ),
               ),
@@ -453,7 +460,7 @@ class _LoadingState extends StatelessWidget {
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
               valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.neonGreen),
+                  const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
           const SizedBox(height: 16),
@@ -489,7 +496,7 @@ class _EmptyState extends StatelessWidget {
             ),
             child: const Icon(
               Icons.rocket_launch_rounded,
-              color: AppColors.textTertiary,
+              color: AppColors.primary,
               size: 36,
             ),
           ),
@@ -583,6 +590,8 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
   final _descriptionController = TextEditingController();
   bool _isSubmitting = false;
   TaskCategory _selectedCategory = TaskCategory.outro;
+  bool _addTimer = false;
+  double _timerValue = 25.0;
 
   @override
   void dispose() {
@@ -600,6 +609,7 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
       title: _titleController.text,
       description: _descriptionController.text,
       category: _selectedCategory,
+      durationInMinutes: _addTimer ? _timerValue.toInt() : null,
     );
 
     if (!context.mounted) return;
@@ -611,7 +621,7 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
           content: Row(
             children: [
               const Icon(Icons.check_circle_rounded,
-                  color: AppColors.neonGreen, size: 18),
+                  color: AppColors.primary, size: 18),
               const SizedBox(width: 8),
               Text(
                 'Missão criada com sucesso!',
@@ -633,20 +643,22 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Handle
             Center(
               child: Container(
@@ -763,7 +775,51 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            // Optional Timer
+            Row(
+              children: [
+                Checkbox(
+                  value: _addTimer,
+                  onChanged: (val) => setState(() => _addTimer = val ?? false),
+                ),
+                Text(
+                  'Adicionar Timer de Foco?',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            if (_addTimer) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.timer_outlined, color: AppColors.accent, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_timerValue.toInt()} minutos',
+                    style: GoogleFonts.inter(
+                      color: AppColors.accent,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              Slider(
+                value: _timerValue,
+                min: 5,
+                max: 60,
+                divisions: 11,
+                activeColor: AppColors.accent,
+                inactiveColor: AppColors.surfaceVariant,
+                onChanged: (val) => setState(() => _timerValue = val),
+              ),
+            ],
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
@@ -796,6 +852,8 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
           ],
         ),
       ),
+    ),
+    ),
     );
   }
 }

@@ -92,12 +92,12 @@ class _SplashScreenState extends State<SplashScreen>
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: AppColors.neonGreen.withValues(alpha: 0.6),
+                          color: AppColors.primary.withValues(alpha: 0.6),
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.neonGreen
+                            color: AppColors.primary
                                 .withValues(alpha: 0.3 * _glowAnimation.value),
                             blurRadius: 40,
                             spreadRadius: 0,
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                       child: const Icon(
                         Icons.bolt_rounded,
-                        color: AppColors.neonGreen,
+                        color: AppColors.primary,
                         size: 52,
                       ),
                     ),
@@ -140,9 +140,9 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 2,
                         child: LinearProgressIndicator(
                           backgroundColor:
-                              AppColors.neonGreen.withValues(alpha: 0.2),
+                              AppColors.primary.withValues(alpha: 0.2),
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.neonGreen),
+                              AppColors.primary),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

@@ -48,7 +48,7 @@ class DashboardScreen extends StatelessWidget {
                           icon: Icons.check_circle_rounded,
                           label: 'Concluídas',
                           value: vm.completedCount.toString(),
-                          color: AppColors.neonGreen,
+                          color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -99,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
                                       sections: [
                                         PieChartSectionData(
                                           value: vm.completedCount.toDouble(),
-                                          color: AppColors.neonGreen,
+                                          color: AppColors.primary,
                                           radius: 50,
                                           title: '${vm.completedCount}',
                                           titleStyle: GoogleFonts.inter(
@@ -134,7 +134,7 @@ class DashboardScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       _LegendItem(
-                                        color: AppColors.neonGreen,
+                                        color: AppColors.primary,
                                         label: 'Concluídas',
                                       ),
                                       const SizedBox(height: 12),
@@ -320,7 +320,7 @@ class DashboardScreen extends StatelessWidget {
         barRods: [
           BarChartRodData(
             toY: value,
-            color: AppColors.neonGreen,
+            color: AppColors.primary,
             width: 16,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
             backDrawRodData: BackgroundBarChartRodData(

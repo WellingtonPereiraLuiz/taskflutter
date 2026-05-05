@@ -11,7 +11,7 @@ class DatabaseService {
   factory DatabaseService() => _instance;
 
   static const String _databaseName = 'grittracker.db';
-  static const int _databaseVersion = 2;
+  static const int _databaseVersion = 3;
   static const String tableTask = 'tasks';
 
   Future<Database> get database async {
@@ -44,7 +44,8 @@ class DatabaseService {
         description TEXT NOT NULL DEFAULT '',
         isCompleted INTEGER NOT NULL DEFAULT 0,
         createdAt TEXT NOT NULL,
-        category TEXT NOT NULL DEFAULT 'outro'
+        category TEXT NOT NULL DEFAULT 'outro',
+        durationInMinutes INTEGER
       )
     ''');
 
@@ -80,6 +81,12 @@ class DatabaseService {
       // Add category column for v2
       await db.execute(
         "ALTER TABLE $tableTask ADD COLUMN category TEXT NOT NULL DEFAULT 'outro'",
+      );
+    }
+    if (oldVersion < 3) {
+      // Add durationInMinutes column for v3
+      await db.execute(
+        "ALTER TABLE $tableTask ADD COLUMN durationInMinutes INTEGER",
       );
     }
   }

@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/task_model.dart';
 import '../viewmodels/task_viewmodel.dart';
+import '../viewmodels/task_viewmodel.dart';
 import '../utils/app_theme.dart';
 import 'pomodoro_modal.dart';
+import 'task_detail_sheet.dart';
 
 class TaskCard extends StatefulWidget {
   final TaskModel task;
@@ -63,7 +65,7 @@ class _TaskCardState extends State<TaskCard>
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: GestureDetector(
-          onTap: () => PomodoroModal.show(context, task),
+          onTap: () => TaskDetailSheet.show(context, task),
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
@@ -71,14 +73,14 @@ class _TaskCardState extends State<TaskCard>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: task.isCompleted
-                    ? AppColors.neonGreen.withValues(alpha: 0.4)
+                    ? AppColors.primary.withValues(alpha: 0.4)
                     : categoryColor.withValues(alpha: 0.5),
                 width: task.isCompleted ? 1 : 1.5,
               ),
               boxShadow: task.isCompleted
                   ? [
                       BoxShadow(
-                        color: AppColors.neonGreen.withValues(alpha: 0.08),
+                        color: AppColors.primary.withValues(alpha: 0.08),
                         blurRadius: 12,
                         spreadRadius: 0,
                       ),
@@ -180,13 +182,13 @@ class _TaskCardState extends State<TaskCard>
                                       horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color:
-                                        AppColors.neonGreen.withValues(alpha: 0.15),
+                                        AppColors.primary.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: const Text(
                                     'CONCLUÍDA',
                                     style: TextStyle(
-                                      color: AppColors.neonGreen,
+                                      color: AppColors.primary,
                                       fontSize: 9,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 0.5,
@@ -206,12 +208,12 @@ class _TaskCardState extends State<TaskCard>
                         IconButton(
                           onPressed: () => PomodoroModal.show(context, task),
                           icon: const Icon(Icons.timer_outlined),
-                          color: AppColors.textTertiary,
-                          iconSize: 18,
-                          padding: EdgeInsets.zero,
+                          color: task.durationInMinutes != null ? AppColors.accent : AppColors.textTertiary,
+                          iconSize: 22,
+                          padding: const EdgeInsets.all(12), // Tap target >= 48
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 48,
+                            minHeight: 48,
                           ),
                           tooltip: 'Iniciar Foco',
                         ),
@@ -220,11 +222,11 @@ class _TaskCardState extends State<TaskCard>
                           onPressed: () => _handleDelete(context),
                           icon: const Icon(Icons.delete_outline_rounded),
                           color: AppColors.textTertiary,
-                          iconSize: 18,
-                          padding: EdgeInsets.zero,
+                          iconSize: 22,
+                          padding: const EdgeInsets.all(12), // Tap target >= 48
                           constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
+                            minWidth: 48,
+                            minHeight: 48,
                           ),
                           tooltip: 'Deletar tarefa',
                         ),
@@ -286,21 +288,21 @@ class _AnimatedCheckboxState extends State<_AnimatedCheckbox>
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
-          width: 24,
-          height: 24,
+          width: 26,
+          height: 26,
           decoration: BoxDecoration(
-            color: widget.value ? AppColors.neonGreen : Colors.transparent,
+            color: widget.value ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
               color:
-                  widget.value ? AppColors.neonGreen : AppColors.textTertiary,
+                  widget.value ? AppColors.primary : AppColors.textTertiary,
               width: 2,
             ),
           ),
           child: widget.value
               ? const Icon(
                   Icons.check_rounded,
-                  size: 16,
+                  size: 18,
                   color: AppColors.background,
                 )
               : null,

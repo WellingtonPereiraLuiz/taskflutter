@@ -25,8 +25,8 @@ class PomodoroModal extends StatefulWidget {
 
 class _PomodoroModalState extends State<PomodoroModal>
     with SingleTickerProviderStateMixin {
-  static const int _totalSeconds = 25 * 60; // 25 minutos
-  int _remainingSeconds = _totalSeconds;
+  late int _totalSeconds;
+  late int _remainingSeconds;
   Timer? _timer;
   bool _isRunning = false;
   late AnimationController _pulseController;
@@ -34,6 +34,9 @@ class _PomodoroModalState extends State<PomodoroModal>
   @override
   void initState() {
     super.initState();
+    _totalSeconds = (widget.task.durationInMinutes ?? 25) * 60;
+    _remainingSeconds = _totalSeconds;
+    
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -88,12 +91,12 @@ class _PomodoroModalState extends State<PomodoroModal>
         title: Text(
           '🎯 Sessão Concluída!',
           style: GoogleFonts.inter(
-            color: AppColors.neonGreen,
+            color: AppColors.accent,
             fontWeight: FontWeight.w800,
           ),
         ),
         content: Text(
-          '25 minutos de foco absoluto em:\n"${widget.task.title}"',
+          '${widget.task.durationInMinutes ?? 25} minutos de foco absoluto em:\n"${widget.task.title}"',
           style: GoogleFonts.inter(color: AppColors.textSecondary),
         ),
         actions: [
@@ -130,7 +133,7 @@ class _PomodoroModalState extends State<PomodoroModal>
         border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neonGreen.withValues(alpha: 0.1),
+            color: AppColors.accent.withValues(alpha: 0.1),
             blurRadius: 40,
             spreadRadius: 0,
           ),
@@ -158,12 +161,12 @@ class _PomodoroModalState extends State<PomodoroModal>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.neonGreen.withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.timer_rounded,
-                  color: AppColors.neonGreen,
+                  color: AppColors.accent,
                   size: 24,
                 ),
               ),
@@ -226,7 +229,7 @@ class _PomodoroModalState extends State<PomodoroModal>
                     strokeCap: StrokeCap.round,
                     backgroundColor: Colors.transparent,
                     valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.neonGreen,
+                      AppColors.accent,
                     ),
                   ),
                 ),
@@ -249,7 +252,7 @@ class _PomodoroModalState extends State<PomodoroModal>
                         _formatTime(_remainingSeconds),
                         style: GoogleFonts.inter(
                           color: _isRunning
-                              ? AppColors.neonGreen
+                              ? AppColors.accent
                               : AppColors.textPrimary,
                           fontSize: 42,
                           fontWeight: FontWeight.w800,
@@ -296,13 +299,13 @@ class _PomodoroModalState extends State<PomodoroModal>
                   decoration: BoxDecoration(
                     color: _isRunning
                         ? Colors.orangeAccent
-                        : AppColors.neonGreen,
+                        : AppColors.accent,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: (_isRunning
                                 ? Colors.orangeAccent
-                                : AppColors.neonGreen)
+                                : AppColors.accent)
                             .withValues(alpha: 0.4),
                         blurRadius: 20,
                         spreadRadius: 0,

@@ -35,13 +35,13 @@ enum TaskCategory {
   int get colorValue {
     switch (this) {
       case TaskCategory.treino:
-        return 0xFFFF6B35; // Laranja intenso
+        return 0xFFF59E0B; // Âmbar
       case TaskCategory.estudo:
-        return 0xFF00D4FF; // Cyan brilhante
+        return 0xFF10B981; // Verde (Esmeralda)
       case TaskCategory.trabalho:
-        return 0xFFAA66FF; // Roxo vibrante
+        return 0xFF8B5CF6; // Roxo (Violeta)
       case TaskCategory.outro:
-        return 0xFF39FF14; // Neon green (padrão)
+        return 0xFF38BDF8; // Azul Claro (Primário)
     }
   }
 
@@ -60,6 +60,7 @@ class TaskModel {
   final bool isCompleted;
   final DateTime createdAt;
   final TaskCategory category;
+  final int? durationInMinutes; // Nova propriedade para o timer opcional
 
   const TaskModel({
     this.id,
@@ -68,6 +69,7 @@ class TaskModel {
     this.isCompleted = false,
     required this.createdAt,
     this.category = TaskCategory.outro,
+    this.durationInMinutes,
   });
 
   TaskModel copyWith({
@@ -77,6 +79,7 @@ class TaskModel {
     bool? isCompleted,
     DateTime? createdAt,
     TaskCategory? category,
+    int? durationInMinutes,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -85,6 +88,7 @@ class TaskModel {
       isCompleted: isCompleted ?? this.isCompleted,
       createdAt: createdAt ?? this.createdAt,
       category: category ?? this.category,
+      durationInMinutes: durationInMinutes ?? this.durationInMinutes,
     );
   }
 
@@ -96,6 +100,7 @@ class TaskModel {
       'isCompleted': isCompleted ? 1 : 0,
       'createdAt': createdAt.toIso8601String(),
       'category': category.name,
+      'durationInMinutes': durationInMinutes,
     };
   }
 
@@ -109,6 +114,7 @@ class TaskModel {
       category: map['category'] != null
           ? TaskCategory.fromString(map['category'] as String)
           : TaskCategory.outro,
+      durationInMinutes: map['durationInMinutes'] as int?,
     );
   }
 
@@ -123,6 +129,6 @@ class TaskModel {
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, isCompleted: $isCompleted, category: ${category.name})';
+    return 'TaskModel(id: $id, title: $title, isCompleted: $isCompleted, category: ${category.name}, duration: $durationInMinutes)';
   }
 }

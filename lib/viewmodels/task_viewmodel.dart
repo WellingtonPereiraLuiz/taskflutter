@@ -14,6 +14,7 @@ class TaskViewModel extends ChangeNotifier {
   String? _errorMessage;
   int _currentStreak = 0;
   bool _hardMode = false;
+  DateTime _selectedDay = DateTime.now(); // Data selecionada no calendário
 
   List<TaskModel> get tasks => List.unmodifiable(_tasks);
   bool get isLoading => _isLoading;
@@ -23,6 +24,7 @@ class TaskViewModel extends ChangeNotifier {
   bool get isEmpty => _tasks.isEmpty;
   int get currentStreak => _currentStreak;
   bool get hardMode => _hardMode;
+  DateTime get selectedDay => _selectedDay;
 
   /// Tarefas filtradas para modo Hard 75 (oculta concluídas).
   List<TaskModel> get displayTasks {
@@ -30,6 +32,15 @@ class TaskViewModel extends ChangeNotifier {
       return _tasks.where((t) => !t.isCompleted).toList();
     }
     return _tasks;
+  }
+
+  /// Tarefas filtradas pelo dia selecionado no calendário.
+  List<TaskModel> get tasksForSelectedDay {
+    return _tasks.where((t) {
+      return t.createdAt.year == _selectedDay.year &&
+          t.createdAt.month == _selectedDay.month &&
+          t.createdAt.day == _selectedDay.day;
+    }).toList();
   }
 
   /// Verifica se existem tarefas pendentes com mais de 24h (atraso).
@@ -94,6 +105,12 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Atualiza o dia selecionado no calendário.
+  void setSelectedDay(DateTime day) {
+    _selectedDay = day;
+    notifyListeners();
+  }
+
   /// Carrega o streak atual do SharedPreferences.
   Future<void> loadStreak() async {
     _currentStreak = await StreakService.getCurrentStreak();
@@ -128,6 +145,7 @@ class TaskViewModel extends ChangeNotifier {
     required String title,
     required String description,
     TaskCategory category = TaskCategory.outro,
+    int? durationInMinutes,
   }) async {
     if (title.trim().isEmpty) {
       _setError('O título não pode ser vazio.');
@@ -141,6 +159,7 @@ class TaskViewModel extends ChangeNotifier {
         description: description.trim(),
         createdAt: DateTime.now(),
         category: category,
+        durationInMinutes: durationInMinutes,
       );
       final created = await _repository.createTask(newTask);
       _tasks.insert(0, created);

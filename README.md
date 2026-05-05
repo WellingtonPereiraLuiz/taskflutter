@@ -7,7 +7,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub Pages](https://img.shields.io/badge/Web-Live%20Demo-39FF14?logo=github)](https://WellingtonPereiraLuiz.github.io/taskflutter/)
+[![GitHub Pages](https://img.shields.io/badge/Web-Live%20Demo-38BDF8?logo=github)](https://WellingtonPereiraLuiz.github.io/taskflutter/)
 
 <br/>
 
@@ -17,7 +17,7 @@ Construído com Flutter, arquitetura MVVM, Provider e SQLite.
 <br/>
 
 <a href="https://WellingtonPereiraLuiz.github.io/taskflutter/downloads/GritTracker.apk">
-  <img src="https://img.shields.io/badge/📥_DOWNLOAD_APK_ANDROID-39FF14?style=for-the-badge&logoColor=black&labelColor=121212" alt="Download APK" />
+  <img src="https://img.shields.io/badge/📥_DOWNLOAD_APK_ANDROID-38BDF8?style=for-the-badge&logoColor=black&labelColor=121212" alt="Download APK" />
 </a>
 
 <br/><br/>
@@ -101,7 +101,16 @@ Porque ela remove a complexidade das ferramentas tradicionais de gestão. Ao ofe
 - **Oculta todas as tarefas concluídas**
 - Mostra apenas o que falta ser feito
 - **Banner vermelho** se houver tarefas atrasadas (24h+)
-- Tela de "vitória" quando todas as missões estiverem cumpridas
+
+### 6. 📅 Calendário de Produtividade
+- Visão visual de tarefas por dia com **table_calendar**
+- Feedback visual do dia selecionado
+- Oculta distrações mostrando apenas tarefas daquela data
+
+### 7. 🧪 Testes Unitários de Qualidade
+- Utilização extensiva de **mocktail** para simular Repositórios
+- Testes cobrindo ViewModel, adição de tarefas e lógicas de data
+- Integração garantida na esteira de desenvolvimento
 
 ### Funcionalidades Base (v1.0)
 - ✅ Cadastro ágil de novas tarefas (título + descrição)
@@ -109,7 +118,7 @@ Porque ela remove a complexidade das ferramentas tradicionais de gestão. Ao ofe
 - ✅ Marcação de conclusão com feedback visual de alto contraste
 - ✅ Exclusão de tarefas com animação
 - ✅ Persistência local robusta (SQLite nativo + fallback in-memory para Web)
-- ✅ Interface Dark Mode Premium focada em concentração
+- ✅ Interface Dark Blue Premium (Alta Fidelidade) focada em concentração
 - ✅ Splash Screen animada com efeito de glow
 
 ---
@@ -149,7 +158,8 @@ lib/
 ├── views/
 │   ├── splash_screen.dart            # Splash animada
 │   ├── home_screen.dart              # Tela principal + BottomNav + Hard75
-│   └── dashboard_screen.dart         # Dashboard com fl_chart
+│   ├── dashboard_screen.dart         # Dashboard com fl_chart
+│   └── calendar_screen.dart          # Visão por data com table_calendar
 ├── widgets/
 │   ├── task_card.dart                # Card de tarefa c/ categoria + Pomodoro
 │   └── pomodoro_modal.dart           # Timer 25min Deep Work
@@ -196,7 +206,7 @@ flutter build web --base-href "/taskflutter/"
 ### Download Direto
 
 <a href="https://WellingtonPereiraLuiz.github.io/taskflutter/downloads/GritTracker.apk">
-  <img src="https://img.shields.io/badge/📥_DOWNLOAD_APK_ANDROID-39FF14?style=for-the-badge&logoColor=black&labelColor=121212" alt="Download APK" />
+  <img src="https://img.shields.io/badge/📥_DOWNLOAD_APK_ANDROID-38BDF8?style=for-the-badge&logoColor=black&labelColor=121212" alt="Download APK" />
 </a>
 
 ---
