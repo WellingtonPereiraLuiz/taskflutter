@@ -6,7 +6,7 @@ class TaskViewModel extends ChangeNotifier {
   final ITaskRepository _repository;
 
   TaskViewModel({ITaskRepository? repository})
-      : _repository = repository ?? TaskRepository();
+      : _repository = repository ?? TaskRepositoryFactory.create();
 
   List<TaskModel> _tasks = [];
   bool _isLoading = false;
@@ -43,7 +43,7 @@ class TaskViewModel extends ChangeNotifier {
     } on RepositoryException catch (e) {
       _setError(e.message);
     } catch (e) {
-      _setError('Erro inesperado ao carregar tarefas.');
+      _setError('Erro inesperado ao carregar tarefas: ${e.toString()}');
     } finally {
       _setLoading(false);
     }
@@ -73,7 +73,7 @@ class TaskViewModel extends ChangeNotifier {
       _setError(e.message);
       return false;
     } catch (e) {
-      _setError('Erro inesperado ao criar tarefa.');
+      _setError('Erro inesperado ao criar tarefa: ${e.toString()}');
       return false;
     } finally {
       _setLoading(false);
@@ -97,7 +97,7 @@ class TaskViewModel extends ChangeNotifier {
       _setError(e.message);
     } catch (e) {
       _tasks[index] = task;
-      _setError('Erro ao atualizar tarefa.');
+      _setError('Erro ao atualizar tarefa: ${e.toString()}');
     }
   }
 
@@ -118,7 +118,7 @@ class TaskViewModel extends ChangeNotifier {
       _setError(e.message);
     } catch (e) {
       _tasks.insert(taskIndex, removedTask);
-      _setError('Erro ao deletar tarefa.');
+      _setError('Erro ao deletar tarefa: ${e.toString()}');
     }
   }
 }

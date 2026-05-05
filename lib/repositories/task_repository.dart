@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/task_model.dart';
 import '../services/database_service.dart';
+
+// ─── Interface ───────────────────────────────────────────────────────────────
 
 abstract class ITaskRepository {
   Future<List<TaskModel>> getAllTasks();
@@ -9,10 +12,23 @@ abstract class ITaskRepository {
   Future<TaskModel?> getTaskById(int id);
 }
 
-class TaskRepository implements ITaskRepository {
+// ─── Factory ─────────────────────────────────────────────────────────────────
+
+class TaskRepositoryFactory {
+  static ITaskRepository create() {
+    if (kIsWeb) {
+      return InMemoryTaskRepository();
+    }
+    return SqfliteTaskRepository();
+  }
+}
+
+// ─── SQLite Implementation (Android / iOS / Desktop) ─────────────────────────
+
+class SqfliteTaskRepository implements ITaskRepository {
   final DatabaseService _databaseService;
 
-  TaskRepository({DatabaseService? databaseService})
+  SqfliteTaskRepository({DatabaseService? databaseService})
       : _databaseService = databaseService ?? DatabaseService();
 
   @override
@@ -105,6 +121,81 @@ class TaskRepository implements ITaskRepository {
   }
 }
 
+// ─── In-Memory Implementation (Web) ──────────────────────────────────────────
+
+class InMemoryTaskRepository implements ITaskRepository {
+  int _nextId = 3;
+
+  final List<TaskModel> _tasks = [
+    TaskModel(
+      id: 1,
+      title: 'Estudar Flutter por 2 horas',
+      description:
+          'Focar nos conceitos de arquitetura MVVM, Provider e widgets avançados.',
+      isCompleted: false,
+      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+    TaskModel(
+      id: 2,
+      title: 'Entregar o projeto GritTracker',
+      description:
+          'Revisar o README, tirar prints e submeter o repositório para o professor.',
+      isCompleted: true,
+      createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+    ),
+  ];
+
+  Future<void> _simulateLatency() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+  }
+
+  @override
+  Future<List<TaskModel>> getAllTasks() async {
+    await _simulateLatency();
+    return List<TaskModel>.from(_tasks.reversed);
+  }
+
+  @override
+  Future<TaskModel> createTask(TaskModel task) async {
+    await _simulateLatency();
+    final newTask = task.copyWith(id: _nextId++);
+    _tasks.add(newTask);
+    return newTask;
+  }
+
+  @override
+  Future<TaskModel> updateTask(TaskModel task) async {
+    await _simulateLatency();
+    final index = _tasks.indexWhere((t) => t.id == task.id);
+    if (index == -1) {
+      throw RepositoryException('Tarefa não encontrada para atualização.');
+    }
+    _tasks[index] = task;
+    return task;
+  }
+
+  @override
+  Future<bool> deleteTask(int id) async {
+    await _simulateLatency();
+    final index = _tasks.indexWhere((t) => t.id == id);
+    if (index == -1) return false;
+    _tasks.removeAt(index);
+    return true;
+  }
+
+  @override
+  Future<TaskModel?> getTaskById(int id) async {
+    await _simulateLatency();
+    try {
+      return _tasks.firstWhere((t) => t.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+// ─── Exception ────────────────────────────────────────────────────────────────
+
 class RepositoryException implements Exception {
   final String message;
   final Exception? originalException;
@@ -114,3 +205,6 @@ class RepositoryException implements Exception {
   @override
   String toString() => 'RepositoryException: $message';
 }
+
+// ─── Backward-compat alias ───────────────────────────────────────────────────
+typedef TaskRepository = SqfliteTaskRepository;

@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
-import 'dart:io';
+import 'package:path/path.dart' as path_pkg;
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -22,17 +21,11 @@ class DatabaseService {
 
   Future<Database> _initDatabase() async {
     String dbPath;
-
     try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        final documentsDir = await getApplicationDocumentsDirectory();
-        dbPath = path.join(documentsDir.path, _databaseName);
-      } else {
-        final documentsDir = await getApplicationSupportDirectory();
-        dbPath = path.join(documentsDir.path, _databaseName);
-      }
+      final documentsDir = await getApplicationDocumentsDirectory();
+      dbPath = path_pkg.join(documentsDir.path, _databaseName);
     } catch (_) {
-      dbPath = path.join(await getDatabasesPath(), _databaseName);
+      dbPath = path_pkg.join(await getDatabasesPath(), _databaseName);
     }
 
     return await openDatabase(
@@ -53,6 +46,23 @@ class DatabaseService {
         createdAt TEXT NOT NULL
       )
     ''');
+
+    // Seed pre-defined tasks
+    final now = DateTime.now();
+    await db.insert(tableTask, {
+      'title': 'Estudar Flutter por 2 horas',
+      'description':
+          'Focar nos conceitos de arquitetura MVVM, Provider e widgets avançados.',
+      'isCompleted': 0,
+      'createdAt': now.subtract(const Duration(hours: 2)).toIso8601String(),
+    });
+    await db.insert(tableTask, {
+      'title': 'Entregar o projeto GritTracker',
+      'description':
+          'Revisar o README, tirar prints e submeter o repositório para o professor.',
+      'isCompleted': 1,
+      'createdAt': now.subtract(const Duration(hours: 1)).toIso8601String(),
+    });
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
