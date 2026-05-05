@@ -11,7 +11,7 @@ class DatabaseService {
   factory DatabaseService() => _instance;
 
   static const String _databaseName = 'grittracker.db';
-  static const int _databaseVersion = 1;
+  static const int _databaseVersion = 2;
   static const String tableTask = 'tasks';
 
   Future<Database> get database async {
@@ -43,7 +43,8 @@ class DatabaseService {
         title TEXT NOT NULL,
         description TEXT NOT NULL DEFAULT '',
         isCompleted INTEGER NOT NULL DEFAULT 0,
-        createdAt TEXT NOT NULL
+        createdAt TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'outro'
       )
     ''');
 
@@ -55,6 +56,7 @@ class DatabaseService {
           'Focar nos conceitos de arquitetura MVVM, Provider e widgets avançados.',
       'isCompleted': 0,
       'createdAt': now.subtract(const Duration(hours: 2)).toIso8601String(),
+      'category': 'estudo',
     });
     await db.insert(tableTask, {
       'title': 'Entregar o projeto GritTracker',
@@ -62,13 +64,23 @@ class DatabaseService {
           'Revisar o README, tirar prints e submeter o repositório para o professor.',
       'isCompleted': 1,
       'createdAt': now.subtract(const Duration(hours: 1)).toIso8601String(),
+      'category': 'trabalho',
+    });
+    await db.insert(tableTask, {
+      'title': 'Treino de 45 minutos',
+      'description': 'Sessão HIIT + core. Sem desculpas.',
+      'isCompleted': 0,
+      'createdAt': now.subtract(const Duration(minutes: 30)).toIso8601String(),
+      'category': 'treino',
     });
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) {
-      await db.execute('DROP TABLE IF EXISTS $tableTask');
-      await _onCreate(db, newVersion);
+    if (oldVersion < 2) {
+      // Add category column for v2
+      await db.execute(
+        "ALTER TABLE $tableTask ADD COLUMN category TEXT NOT NULL DEFAULT 'outro'",
+      );
     }
   }
 

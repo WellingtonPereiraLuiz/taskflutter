@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/task_model.dart';
 import '../repositories/task_repository.dart';
+import '../services/streak_service.dart';
 
 class TaskViewModel extends ChangeNotifier {
   final ITaskRepository _repository;
@@ -11,6 +12,8 @@ class TaskViewModel extends ChangeNotifier {
   List<TaskModel> _tasks = [];
   bool _isLoading = false;
   String? _errorMessage;
+  int _currentStreak = 0;
+  bool _hardMode = false;
 
   List<TaskModel> get tasks => List.unmodifiable(_tasks);
   bool get isLoading => _isLoading;
@@ -18,6 +21,57 @@ class TaskViewModel extends ChangeNotifier {
   int get completedCount => _tasks.where((t) => t.isCompleted).length;
   int get pendingCount => _tasks.where((t) => !t.isCompleted).length;
   bool get isEmpty => _tasks.isEmpty;
+  int get currentStreak => _currentStreak;
+  bool get hardMode => _hardMode;
+
+  /// Tarefas filtradas para modo Hard 75 (oculta concluídas).
+  List<TaskModel> get displayTasks {
+    if (_hardMode) {
+      return _tasks.where((t) => !t.isCompleted).toList();
+    }
+    return _tasks;
+  }
+
+  /// Verifica se existem tarefas pendentes com mais de 24h (atraso).
+  bool get hasOverdueTasks {
+    final now = DateTime.now();
+    return _tasks.any(
+      (t) => !t.isCompleted && now.difference(t.createdAt).inHours >= 24,
+    );
+  }
+
+  /// Taxa de sucesso (% de tarefas concluídas).
+  double get successRate {
+    if (_tasks.isEmpty) return 0;
+    return (completedCount / _tasks.length) * 100;
+  }
+
+  /// Dados para gráfico semanal de tarefas concluídas por dia.
+  Map<int, int> get weeklyCompletionData {
+    final now = DateTime.now();
+    final Map<int, int> data = {};
+    for (int i = 6; i >= 0; i--) {
+      final day = now.subtract(Duration(days: i));
+      final weekday = day.weekday; // 1=Mon ... 7=Sun
+      final completedOnDay = _tasks.where((t) {
+        return t.isCompleted &&
+            t.createdAt.year == day.year &&
+            t.createdAt.month == day.month &&
+            t.createdAt.day == day.day;
+      }).length;
+      data[weekday] = completedOnDay;
+    }
+    return data;
+  }
+
+  /// Contagem de tarefas por categoria.
+  Map<TaskCategory, int> get categoryDistribution {
+    final Map<TaskCategory, int> data = {};
+    for (final task in _tasks) {
+      data[task.category] = (data[task.category] ?? 0) + 1;
+    }
+    return data;
+  }
 
   void _setLoading(bool value) {
     _isLoading = value;
@@ -34,12 +88,33 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Toggle do modo Hard 75.
+  void toggleHardMode() {
+    _hardMode = !_hardMode;
+    notifyListeners();
+  }
+
+  /// Carrega o streak atual do SharedPreferences.
+  Future<void> loadStreak() async {
+    _currentStreak = await StreakService.getCurrentStreak();
+    notifyListeners();
+  }
+
+  /// Registra atividade de hoje e atualiza streak.
+  Future<void> recordStreakActivity() async {
+    _currentStreak = await StreakService.recordActivity();
+    notifyListeners();
+  }
+
   Future<void> loadTasks() async {
     _setLoading(true);
     _setError(null);
     try {
       final tasks = await _repository.getAllTasks();
       _tasks = tasks;
+      // Carrega streak ao carregar tarefas
+      await loadStreak();
+      await recordStreakActivity();
     } on RepositoryException catch (e) {
       _setError(e.message);
     } catch (e) {
@@ -52,6 +127,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<bool> createTask({
     required String title,
     required String description,
+    TaskCategory category = TaskCategory.outro,
   }) async {
     if (title.trim().isEmpty) {
       _setError('O título não pode ser vazio.');
@@ -64,6 +140,7 @@ class TaskViewModel extends ChangeNotifier {
         title: title.trim(),
         description: description.trim(),
         createdAt: DateTime.now(),
+        category: category,
       );
       final created = await _repository.createTask(newTask);
       _tasks.insert(0, created);

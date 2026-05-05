@@ -124,7 +124,7 @@ class SqfliteTaskRepository implements ITaskRepository {
 // ─── In-Memory Implementation (Web) ──────────────────────────────────────────
 
 class InMemoryTaskRepository implements ITaskRepository {
-  int _nextId = 3;
+  int _nextId = 4;
 
   final List<TaskModel> _tasks = [
     TaskModel(
@@ -134,6 +134,7 @@ class InMemoryTaskRepository implements ITaskRepository {
           'Focar nos conceitos de arquitetura MVVM, Provider e widgets avançados.',
       isCompleted: false,
       createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+      category: TaskCategory.estudo,
     ),
     TaskModel(
       id: 2,
@@ -142,6 +143,15 @@ class InMemoryTaskRepository implements ITaskRepository {
           'Revisar o README, tirar prints e submeter o repositório para o professor.',
       isCompleted: true,
       createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+      category: TaskCategory.trabalho,
+    ),
+    TaskModel(
+      id: 3,
+      title: 'Treino de 45 minutos',
+      description: 'Sessão HIIT + core. Sem desculpas.',
+      isCompleted: false,
+      createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
+      category: TaskCategory.treino,
     ),
   ];
 

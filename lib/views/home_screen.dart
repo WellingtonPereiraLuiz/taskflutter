@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../viewmodels/task_viewmodel.dart';
+import '../models/task_model.dart';
 import '../utils/app_theme.dart';
 import '../widgets/task_card.dart';
+import 'dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -32,70 +36,246 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      _TasksPage(onAddTask: () => _openAddTaskModal(context)),
+      const DashboardScreen(),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            _buildStatsRow(context),
-            const SizedBox(height: 8),
-            Expanded(child: _buildBody(context)),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: pages,
+      ),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: () => _openAddTaskModal(context),
+              tooltip: 'Nova tarefa',
+              child: const Icon(Icons.add_rounded, size: 28),
+            )
+          : null,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: AppColors.cardBorder, width: 1),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          backgroundColor: AppColors.surface,
+          selectedItemColor: AppColors.neonGreen,
+          unselectedItemColor: AppColors.textTertiary,
+          type: BottomNavigationBarType.fixed,
+          selectedLabelStyle: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.task_alt_rounded),
+              label: 'Missões',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_rounded),
+              label: 'Dashboard',
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openAddTaskModal(context),
-        tooltip: 'Nova tarefa',
-        child: const Icon(Icons.add_rounded, size: 28),
+    );
+  }
+}
+
+// ─── Tasks Page (Tab 1) ──────────────────────────────────────────────────────
+
+class _TasksPage extends StatelessWidget {
+  final VoidCallback onAddTask;
+
+  const _TasksPage({required this.onAddTask});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          _buildHardModeWarning(context),
+          _buildStatsRow(context),
+          const SizedBox(height: 8),
+          Expanded(child: _buildBody(context)),
+        ],
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<TaskViewModel>(
+      builder: (context, vm, _) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'GritTracker',
-                style: GoogleFonts.inter(
-                  color: AppColors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.8,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'GritTracker',
+                        style: GoogleFonts.inter(
+                          color: AppColors.textPrimary,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Streak Badge
+                      if (vm.currentStreak > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFF6B35), Color(0xFFFF4444)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF6B35)
+                                    .withValues(alpha: 0.4),
+                                blurRadius: 12,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('🔥', style: TextStyle(fontSize: 14)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${vm.currentStreak} ${vm.currentStreak == 1 ? "Dia" : "Dias"}',
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  Text(
+                    'Suas missões do dia',
+                    style: GoogleFonts.inter(
+                      color: AppColors.textTertiary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'Suas missões do dia',
-                style: GoogleFonts.inter(
-                  color: AppColors.textTertiary,
-                  fontSize: 13,
-                ),
+              // Hard 75 Toggle
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: vm.toggleHardMode,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: vm.hardMode
+                            ? AppColors.error.withValues(alpha: 0.2)
+                            : AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: vm.hardMode
+                              ? AppColors.error
+                              : AppColors.cardBorder,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.local_fire_department_rounded,
+                            color: vm.hardMode
+                                ? AppColors.error
+                                : AppColors.textTertiary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'H75',
+                            style: GoogleFonts.inter(
+                              color: vm.hardMode
+                                  ? AppColors.error
+                                  : AppColors.textTertiary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          Container(
-            width: 44,
-            height: 44,
+        );
+      },
+    );
+  }
+
+  Widget _buildHardModeWarning(BuildContext context) {
+    return Consumer<TaskViewModel>(
+      builder: (context, vm, _) {
+        if (!vm.hardMode) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.cardBorder),
+              border: Border.all(
+                  color: AppColors.error.withValues(alpha: 0.3)),
             ),
-            child: const Icon(
-              Icons.bolt_rounded,
-              color: AppColors.neonGreen,
-              size: 24,
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded,
+                    color: AppColors.error, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    vm.hasOverdueTasks
+                        ? '⚠️ MODO HARD 75 ATIVO — Você tem tarefas atrasadas!'
+                        : '🔥 MODO HARD 75 ATIVO — Apenas tarefas pendentes visíveis.',
+                    style: GoogleFonts.inter(
+                      color: vm.hasOverdueTasks
+                          ? AppColors.error
+                          : Colors.orangeAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -154,14 +334,46 @@ class _HomeScreenState extends State<HomeScreen> {
           return const _EmptyState();
         }
 
+        final displayTasks = vm.displayTasks;
+
+        if (displayTasks.isEmpty && vm.hardMode) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('🏆', style: TextStyle(fontSize: 48)),
+                const SizedBox(height: 16),
+                Text(
+                  'Todas as missões cumpridas!',
+                  style: GoogleFonts.inter(
+                    color: AppColors.neonGreen,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Modo Hard 75: Zero pendências.',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textTertiary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         // Task list
         return Stack(
           children: [
             ListView.builder(
               padding: const EdgeInsets.only(bottom: 100),
-              itemCount: vm.tasks.length,
+              itemCount: displayTasks.length,
               itemBuilder: (context, index) {
-                return TaskCard(key: ValueKey(vm.tasks[index].id), task: vm.tasks[index]);
+                return TaskCard(
+                    key: ValueKey(displayTasks[index].id),
+                    task: displayTasks[index]);
               },
             ),
             if (vm.isLoading)
@@ -356,6 +568,8 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
+// ─── Add Task Sheet (with Category Selector) ─────────────────────────────────
+
 class _AddTaskSheet extends StatefulWidget {
   const _AddTaskSheet();
 
@@ -368,6 +582,7 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isSubmitting = false;
+  TaskCategory _selectedCategory = TaskCategory.outro;
 
   @override
   void dispose() {
@@ -384,6 +599,7 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
     final success = await vm.createTask(
       title: _titleController.text,
       description: _descriptionController.text,
+      category: _selectedCategory,
     );
 
     if (!context.mounted) return;
@@ -499,7 +715,53 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
               ),
               maxLines: 3,
               textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _submit(context),
+            ),
+            const SizedBox(height: 16),
+
+            // Category Selector
+            Text(
+              'Categoria',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: TaskCategory.values.map((cat) {
+                final isSelected = _selectedCategory == cat;
+                final catColor = Color(cat.colorValue);
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = cat),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? catColor.withValues(alpha: 0.2)
+                          : AppColors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isSelected ? catColor : AppColors.cardBorder,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Text(
+                      '${cat.emoji} ${cat.label}',
+                      style: GoogleFonts.inter(
+                        color: isSelected ? catColor : AppColors.textSecondary,
+                        fontSize: 13,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 20),
             Row(

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/task_model.dart';
 import '../viewmodels/task_viewmodel.dart';
 import '../utils/app_theme.dart';
+import 'pomodoro_modal.dart';
 
 class TaskCard extends StatefulWidget {
   final TaskModel task;
@@ -55,142 +56,182 @@ class _TaskCardState extends State<TaskCard>
     final task = widget.task;
     final dateFormatted =
         DateFormat('dd/MM/yyyy HH:mm').format(task.createdAt);
+    final categoryColor = Color(task.category.colorValue);
 
     return FadeTransition(
       opacity: _fadeAnimation,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: task.isCompleted
-                  ? AppColors.neonGreen.withValues(alpha: 0.4)
-                  : AppColors.cardBorder,
-              width: 1,
+        child: GestureDetector(
+          onTap: () => PomodoroModal.show(context, task),
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: task.isCompleted
+                    ? AppColors.neonGreen.withValues(alpha: 0.4)
+                    : categoryColor.withValues(alpha: 0.5),
+                width: task.isCompleted ? 1 : 1.5,
+              ),
+              boxShadow: task.isCompleted
+                  ? [
+                      BoxShadow(
+                        color: AppColors.neonGreen.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                  : null,
             ),
-            boxShadow: task.isCompleted
-                ? [
-                    BoxShadow(
-                      color: AppColors.neonGreen.withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      spreadRadius: 0,
+            child: Material(
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Animated Checkbox
+                    _AnimatedCheckbox(
+                      value: task.isCompleted,
+                      onChanged: (_) {
+                        context
+                            .read<TaskViewModel>()
+                            .toggleTaskCompletion(task);
+                      },
                     ),
-                  ]
-                : null,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Animated Checkbox
-                  _AnimatedCheckbox(
-                    value: task.isCompleted,
-                    onChanged: (_) {
-                      context
-                          .read<TaskViewModel>()
-                          .toggleTaskCompletion(task);
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  // Content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          task.title,
-                          style: TextStyle(
-                            color: task.isCompleted
-                                ? AppColors.textTertiary
-                                : AppColors.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            decoration: task.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                            decorationColor: AppColors.textTertiary,
-                          ),
-                        ),
-                        if (task.description.isNotEmpty) ...[
-                          const SizedBox(height: 4),
+                    const SizedBox(width: 12),
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            task.description,
+                            task.title,
                             style: TextStyle(
                               color: task.isCompleted
                                   ? AppColors.textTertiary
-                                  : AppColors.textSecondary,
-                              fontSize: 13,
+                                  : AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
                               decoration: task.isCompleted
                                   ? TextDecoration.lineThrough
                                   : null,
                               decorationColor: AppColors.textTertiary,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ],
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time_rounded,
-                              size: 12,
-                              color: AppColors.textTertiary,
-                            ),
-                            const SizedBox(width: 4),
+                          if (task.description.isNotEmpty) ...[
+                            const SizedBox(height: 4),
                             Text(
-                              dateFormatted,
-                              style: const TextStyle(
-                                color: AppColors.textTertiary,
-                                fontSize: 11,
+                              task.description,
+                              style: TextStyle(
+                                color: task.isCompleted
+                                    ? AppColors.textTertiary
+                                    : AppColors.textSecondary,
+                                fontSize: 13,
+                                decoration: task.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                decorationColor: AppColors.textTertiary,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            if (task.isCompleted) ...[
-                              const SizedBox(width: 8),
+                          ],
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              // Category badge
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
+                                    horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color:
-                                      AppColors.neonGreen.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: categoryColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
-                                  'CONCLUÍDA',
+                                child: Text(
+                                  '${task.category.emoji} ${task.category.label}',
                                   style: TextStyle(
-                                    color: AppColors.neonGreen,
-                                    fontSize: 9,
+                                    color: categoryColor,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                Icons.access_time_rounded,
+                                size: 12,
+                                color: AppColors.textTertiary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                dateFormatted,
+                                style: const TextStyle(
+                                  color: AppColors.textTertiary,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              if (task.isCompleted) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        AppColors.neonGreen.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'CONCLUÍDA',
+                                    style: TextStyle(
+                                      color: AppColors.neonGreen,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Actions column
+                    Column(
+                      children: [
+                        // Pomodoro button
+                        IconButton(
+                          onPressed: () => PomodoroModal.show(context, task),
+                          icon: const Icon(Icons.timer_outlined),
+                          color: AppColors.textTertiary,
+                          iconSize: 18,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          tooltip: 'Iniciar Foco',
+                        ),
+                        // Delete button
+                        IconButton(
+                          onPressed: () => _handleDelete(context),
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          color: AppColors.textTertiary,
+                          iconSize: 18,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          tooltip: 'Deletar tarefa',
                         ),
                       ],
                     ),
-                  ),
-                  // Delete button
-                  IconButton(
-                    onPressed: () => _handleDelete(context),
-                    icon: const Icon(Icons.delete_outline_rounded),
-                    color: AppColors.textTertiary,
-                    iconSize: 20,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                    tooltip: 'Deletar tarefa',
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
