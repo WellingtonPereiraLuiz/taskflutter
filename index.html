@@ -20,7 +20,7 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="GritTracker 2.0 — Forje disciplina, execute sem desculpas. App de alta performance para gestão de tarefas, streaks, Pomodoro e dashboards.">
-  <meta name="theme-color" content="#121212">
+  <meta name="theme-color" content="#0B0F19">
   <meta name="author" content="Wellington Pereira Luiz">
   <meta name="keywords" content="GritTracker, produtividade, tarefas, Pomodoro, Flutter, disciplina, streaks">
 
@@ -48,7 +48,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #121212;
+      background: #0B0F19;
       overflow: hidden;
     }
 
@@ -56,7 +56,7 @@
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       z-index: 9999;
-      background: #121212;
+      background: #0B0F19;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -74,12 +74,12 @@
     .loader-icon {
       width: 96px;
       height: 96px;
-      background: #1E1E1E;
+      background: #1E293B;
       border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(57, 255, 20, 0.5);
+      border: 2px solid rgba(56, 189, 248, 0.5);
       animation: icon-glow 2s ease-in-out infinite alternate;
       margin-bottom: 32px;
     }
@@ -87,17 +87,17 @@
     .loader-icon svg {
       width: 52px;
       height: 52px;
-      filter: drop-shadow(0 0 12px rgba(57, 255, 20, 0.6));
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.6));
     }
 
     @keyframes icon-glow {
       0% {
-        box-shadow: 0 0 20px rgba(57, 255, 20, 0.1),
-                    0 0 60px rgba(57, 255, 20, 0.05);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.1),
+                    0 0 60px rgba(56, 189, 248, 0.05);
       }
       100% {
-        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3),
-                    0 0 80px rgba(57, 255, 20, 0.15);
+        box-shadow: 0 0 30px rgba(56, 189, 248, 0.3),
+                    0 0 80px rgba(56, 189, 248, 0.15);
       }
     }
 
@@ -111,21 +111,21 @@
     }
 
     .loader-title span {
-      color: #39FF14;
-      text-shadow: 0 0 20px rgba(57, 255, 20, 0.5),
-                   0 0 40px rgba(57, 255, 20, 0.2);
+      color: #38BDF8;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5),
+                   0 0 40px rgba(56, 189, 248, 0.2);
       animation: neon-pulse 2s ease-in-out infinite alternate;
     }
 
     @keyframes neon-pulse {
       0% {
-        text-shadow: 0 0 10px rgba(57, 255, 20, 0.3),
-                     0 0 30px rgba(57, 255, 20, 0.1);
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3),
+                     0 0 30px rgba(56, 189, 248, 0.1);
       }
       100% {
-        text-shadow: 0 0 20px rgba(57, 255, 20, 0.6),
-                     0 0 60px rgba(57, 255, 20, 0.3),
-                     0 0 100px rgba(57, 255, 20, 0.1);
+        text-shadow: 0 0 20px rgba(56, 189, 248, 0.6),
+                     0 0 60px rgba(56, 189, 248, 0.3),
+                     0 0 100px rgba(56, 189, 248, 0.1);
       }
     }
 
@@ -143,7 +143,7 @@
     .loader-subtitle {
       font-size: 14px;
       font-weight: 400;
-      color: #6B6B6B;
+      color: #94A3B8;
       letter-spacing: 0.5px;
       margin-bottom: 48px;
       animation: title-in 0.8s ease-out 0.2s both;
@@ -152,7 +152,7 @@
     .loader-bar-container {
       width: 140px;
       height: 3px;
-      background: rgba(57, 255, 20, 0.15);
+      background: rgba(56, 189, 248, 0.15);
       border-radius: 4px;
       overflow: hidden;
       animation: title-in 0.8s ease-out 0.4s both;
@@ -161,10 +161,10 @@
     .loader-bar {
       height: 100%;
       width: 40%;
-      background: #39FF14;
+      background: #38BDF8;
       border-radius: 4px;
       animation: loader-slide 1.5s ease-in-out infinite;
-      box-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
     }
 
     @keyframes loader-slide {
@@ -177,7 +177,7 @@
       position: absolute;
       bottom: 32px;
       font-size: 11px;
-      color: #333;
+      color: #94A3B8;
       letter-spacing: 1px;
       font-weight: 700;
       animation: title-in 0.8s ease-out 0.6s both;
@@ -188,7 +188,7 @@
       position: absolute;
       width: 2px;
       height: 2px;
-      background: #39FF14;
+      background: #38BDF8;
       border-radius: 50%;
       opacity: 0;
       animation: float-up 4s ease-in-out infinite;
@@ -215,10 +215,10 @@
     <!-- Logo Icon -->
     <div class="loader-icon">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M11 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V11" stroke="#39FF14" stroke-width="2" stroke-linecap="round"/>
-        <path d="M7 13L10 16L17 9" stroke="#39FF14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="18" cy="18" r="3" stroke="#39FF14" stroke-width="2"/>
-        <path d="M18 16.5V18L19 19" stroke="#39FF14" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M11 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V11" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7 13L10 16L17 9" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18" cy="18" r="3" stroke="#38BDF8" stroke-width="2"/>
+        <path d="M18 16.5V18L19 19" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
     </div>
 
