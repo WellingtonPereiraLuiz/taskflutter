@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GritTracker 2.0 — Forje disciplina, execute sem desculpas. App de alta performance para gestão de tarefas, streaks, Pomodoro e dashboards.">
+  <meta name="theme-color" content="#0B0F19">
+  <meta name="author" content="Wellington Pereira Luiz">
+  <meta name="keywords" content="GritTracker, produtividade, tarefas, Pomodoro, Flutter, disciplina, streaks">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="GritTracker 2.0 — Forje sua Disciplina">
+  <meta property="og:description" content="App de alta performance para gestão de tarefas inegociáveis. Dashboard, Pomodoro, Streaks e Modo Hard 75.">
+  <meta property="og:type" content="website">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GritTracker">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>GritTracker 2.0 — Forje sua Disciplina</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Premium Dark Mode Loader Styles -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0B0F19;
+      overflow: hidden;
+    }
+
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 9999;
+      background: #0B0F19;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-icon {
+      width: 96px;
+      height: 96px;
+      background: #1E293B;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(56, 189, 248, 0.5);
+      animation: icon-glow 2s ease-in-out infinite alternate;
+      margin-bottom: 32px;
+    }
+
+    .loader-icon svg {
+      width: 52px;
+      height: 52px;
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.6));
+    }
+
+    @keyframes icon-glow {
+      0% {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.1),
+                    0 0 60px rgba(56, 189, 248, 0.05);
+      }
+      100% {
+        box-shadow: 0 0 30px rgba(56, 189, 248, 0.3),
+                    0 0 80px rgba(56, 189, 248, 0.15);
+      }
+    }
+
+    .loader-title {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: #ffffff;
+      margin-bottom: 8px;
+      animation: title-in 0.8s ease-out both;
+    }
+
+    .loader-title span {
+      color: #38BDF8;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5),
+                   0 0 40px rgba(56, 189, 248, 0.2);
+      animation: neon-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-pulse {
+      0% {
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3),
+                     0 0 30px rgba(56, 189, 248, 0.1);
+      }
+      100% {
+        text-shadow: 0 0 20px rgba(56, 189, 248, 0.6),
+                     0 0 60px rgba(56, 189, 248, 0.3),
+                     0 0 100px rgba(56, 189, 248, 0.1);
+      }
+    }
+
+    @keyframes title-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .loader-subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+      margin-bottom: 48px;
+      animation: title-in 0.8s ease-out 0.2s both;
+    }
+
+    .loader-bar-container {
+      width: 140px;
+      height: 3px;
+      background: rgba(56, 189, 248, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      animation: title-in 0.8s ease-out 0.4s both;
+    }
+
+    .loader-bar {
+      height: 100%;
+      width: 40%;
+      background: #38BDF8;
+      border-radius: 4px;
+      animation: loader-slide 1.5s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+    }
+
+    @keyframes loader-slide {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(250%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .loader-version {
+      position: absolute;
+      bottom: 32px;
+      font-size: 11px;
+      color: #94A3B8;
+      letter-spacing: 1px;
+      font-weight: 700;
+      animation: title-in 0.8s ease-out 0.6s both;
+    }
+
+    /* Ambient particles */
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #38BDF8;
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-up 4s ease-in-out infinite;
+    }
+
+    @keyframes float-up {
+      0% { opacity: 0; transform: translateY(0) scale(0); }
+      20% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-200px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Premium Loading Screen -->
+  <div id="loading-screen">
+    <!-- Ambient Particles -->
+    <div class="particle" style="left: 10%; bottom: 20%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 25%; bottom: 10%; animation-delay: 0.8s;"></div>
+    <div class="particle" style="left: 50%; bottom: 15%; animation-delay: 1.6s;"></div>
+    <div class="particle" style="left: 70%; bottom: 25%; animation-delay: 0.4s;"></div>
+    <div class="particle" style="left: 85%; bottom: 12%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 40%; bottom: 30%; animation-delay: 1.2s;"></div>
+
+    <!-- Logo Icon -->
+    <div class="loader-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V11" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+        <path d="M7 13L10 16L17 9" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18" cy="18" r="3" stroke="#38BDF8" stroke-width="2"/>
+        <path d="M18 16.5V18L19 19" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Title -->
+    <div class="loader-title"><span>GRIT</span> Tracker</div>
+
+    <!-- Subtitle -->
+    <div class="loader-subtitle">Forging discipline...</div>
+
+    <!-- Loading Bar -->
+    <div class="loader-bar-container">
+      <div class="loader-bar"></div>
+    </div>
+
+    <!-- Version -->
+    <div class="loader-version">v2.0.0 — HIGH PERFORMANCE EDITION</div>
+  </div>
+
+  <script>
+    // Hide loader when Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      var loader = document.getElementById('loading-screen');
+      if (loader) {
+        loader.classList.add('hidden');
+        setTimeout(function() { loader.remove(); }, 700);
+      }
+    });
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

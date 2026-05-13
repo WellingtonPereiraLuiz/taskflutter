@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338925619861",
+    "project_id": "grittracker-721c9",
+    "storage_bucket": "grittracker-721c9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338925619861:android:5a9a0fe84ad3d754b3299c",
+        "android_client_info": {
+          "package_name": "com.example.taskflutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGjyoVe9X_NK9ehxOf94j0dwM3_x3ozgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
