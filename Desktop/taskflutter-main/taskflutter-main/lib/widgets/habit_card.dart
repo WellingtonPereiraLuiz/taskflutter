@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -23,29 +24,33 @@ class HabitCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: doneToday
-                ? catColor.withValues(alpha: 0.6)
-                : AppColors.cardBorder,
-            width: doneToday ? 1.5 : 1,
-          ),
-          boxShadow: doneToday
-              ? [
-                  BoxShadow(
-                    color: catColor.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Padding(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: doneToday
+                    ? catColor.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.1),
+                width: doneToday ? 1.5 : 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: doneToday
+                      ? catColor.withValues(alpha: 0.15)
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,6 +191,8 @@ class HabitCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
         ),
       ),
     );

@@ -52,8 +52,8 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const HomeScreen(),
-            transitionsBuilder: (_, animation, __, child) {
+            pageBuilder: (_, _, _) => const HomeScreen(),
+            transitionsBuilder: (_, animation, _, child) {
               return FadeTransition(opacity: animation, child: child);
             },
             transitionDuration: const Duration(milliseconds: 500),
@@ -97,8 +97,9 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary
-                                .withValues(alpha: 0.3 * _glowAnimation.value),
+                            color: AppColors.primary.withValues(
+                              alpha: 0.3 * _glowAnimation.value,
+                            ),
                             blurRadius: 40,
                             spreadRadius: 0,
                           ),
@@ -139,10 +140,12 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 32,
                         height: 2,
                         child: LinearProgressIndicator(
-                          backgroundColor:
-                              AppColors.primary.withValues(alpha: 0.2),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.primary),
+                            AppColors.primary,
+                          ),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

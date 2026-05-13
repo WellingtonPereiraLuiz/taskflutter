@@ -16,6 +16,7 @@ class DashboardScreen extends StatelessWidget {
         child: Consumer<TaskViewModel>(
           builder: (context, vm, _) {
             return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

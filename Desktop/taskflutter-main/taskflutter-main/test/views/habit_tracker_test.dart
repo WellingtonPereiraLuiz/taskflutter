@@ -117,7 +117,8 @@ void main() {
 
         // Abre o modal via FAB
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         // Seleciona o tipo "Hábito"
         await tester.tap(find.text('Hábito'));
@@ -144,7 +145,8 @@ void main() {
 
         // Abre o modal
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         // Seleciona tipo "Hábito"
         await tester.tap(find.text('Hábito'));
@@ -178,7 +180,8 @@ void main() {
 
         // Cria o hábito via modal
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
         await tester.tap(find.text('Hábito'));
         await tester.pump();
         await tester.enterText(
@@ -203,7 +206,8 @@ void main() {
 
         // Cria o hábito
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
         await tester.tap(find.text('Hábito'));
         await tester.pump();
         await tester.enterText(
@@ -254,7 +258,8 @@ void main() {
 
         // Abre o modal
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         // Seleciona Hábito
         await tester.tap(find.text('Hábito'));

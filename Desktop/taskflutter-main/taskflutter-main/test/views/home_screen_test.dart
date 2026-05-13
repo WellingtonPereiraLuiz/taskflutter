@@ -126,7 +126,8 @@ void main() {
         await tester.pump();
 
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         expect(find.text('Nova Missão'), findsOneWidget);
       },
@@ -139,7 +140,8 @@ void main() {
         await tester.pump();
 
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         expect(find.text('Criar Missão'), findsOneWidget);
       },
@@ -152,7 +154,8 @@ void main() {
         await tester.pump();
 
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         expect(find.text('Tarefa'), findsOneWidget);
         expect(find.text('Hábito'), findsOneWidget);
@@ -166,7 +169,8 @@ void main() {
         await tester.pump();
 
         await tester.tap(find.byType(FloatingActionButton));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
 
         // Toca no toggle "Hábito"
         await tester.tap(find.text('Hábito'));

@@ -1,5 +1,7 @@
 # GritTracker 🔥
 
+[📥 BAIXAR APK (VERSÃO FINAL)](https://WellingtonPereiraLuiz.github.io/taskflutter/downloads/GritTracker.apk)
+
 > **Forje disciplina. Conquiste rotinas.**  
 > Um rastreador de tarefas e hábitos diários construído com Flutter + MVVM + Provider.
 
@@ -39,6 +41,11 @@
 
 ## 🛡️ Arquitetura
 
+O projeto utiliza os seguintes padrões:
+- **MVVM (Model-View-ViewModel):** Separação clara de interface (View) da lógica de negócios (ViewModel).
+- **Repository Pattern:** O `TaskViewModel` depende da abstração `ITaskRepository`, permitindo trocar a camada de dados facilmente (ex: SQLite para Produção, InMemory para Testes/Web).
+- **Singleton para o DB:** O `DatabaseService` é um Singleton garantindo uma única conexão e instância do SQLite gerenciando todas as transações, protegendo contra vazamentos de memória e locks do DB.
+
 ```
 lib/
 ├── main.dart               # Entry point (Firebase init + Provider)
@@ -48,7 +55,7 @@ lib/
 │   └── task_repository.dart # ITaskRepository, SQLite e InMemory impl.
 ├── services/
 │   ├── auth_service.dart   # Google Sign-In + Firebase Auth
-│   ├── database_service.dart # SQLite (sqflite) — v4 com hábitos
+│   ├── database_service.dart # SQLite (sqflite) — Singleton Pattern
 │   └── streak_service.dart # SharedPreferences streak tracking
 ├── viewmodels/
 │   └── task_viewmodel.dart # ChangeNotifier MVVM — tarefas + hábitos
@@ -57,10 +64,11 @@ lib/
 │   ├── home_screen.dart    # Seções Missões + Hábitos + modal FAB
 │   ├── dashboard_screen.dart
 │   ├── calendar_screen.dart
+│   ├── profile_screen.dart # Perfil de usuário e Hard Mode
 │   └── splash_screen.dart
 ├── widgets/
 │   ├── task_card.dart      # Card de tarefa com animação + delete
-│   ├── habit_card.dart     # Card de hábito com progress + week dots
+│   ├── habit_card.dart     # Card de hábito (Glassmorphism + week dots)
 │   ├── pomodoro_modal.dart
 │   └── task_detail_sheet.dart
 └── utils/
@@ -155,7 +163,13 @@ flutter_icons:
 
 ---
 
-## 🧪 Testes de Widget
+## 🧪 Estratégia de Qualidade (ISTQB)
+
+A aplicação foi validada usando conceitos robustos baseados no **Framework ISTQB**, aplicando **Shift-Left Testing** para garantir a qualidade desde o início do ciclo de vida:
+
+- **Testes de Regressão Automatizados:** Sempre que uma nova funcionalidade é adicionada, a suíte de testes inteira é rodada. Se algo quebrar, a automação detecta imediatamente. 
+- **Testes de Integração / Widget (Caixa Preta):** O fluxo de usuário é validado desde o clique até as interações de estado e persistência simulada via `flutter_test`.
+- **Testes de Unidade (Caixa Branca):** A validação da lógica de serviços críticos, como o mock de autenticação e repositórios virtuais.
 
 ```bash
 # Rodar todos os testes

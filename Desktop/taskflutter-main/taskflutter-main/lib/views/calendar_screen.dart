@@ -148,6 +148,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                       )
                     : ListView.builder(
+                        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                         padding: const EdgeInsets.only(bottom: 100),
                         itemCount: tasksForDay.length,
                         itemBuilder: (context, index) {

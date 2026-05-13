@@ -8,6 +8,8 @@ import '../widgets/task_card.dart';
 import '../widgets/habit_card.dart';
 import 'dashboard_screen.dart';
 import 'calendar_screen.dart';
+import 'profile_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _TasksPage(onAddTask: () => _openAddTaskModal(context)),
       const CalendarScreen(),
       const DashboardScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -80,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(icon: Icon(Icons.task_alt_rounded), label: 'Missões'),
             BottomNavigationBarItem(icon: Icon(Icons.calendar_month_rounded), label: 'Calendário'),
             BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: 'Dashboard'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Perfil'),
           ],
         ),
       ),
@@ -262,6 +266,7 @@ class _TasksPage extends StatelessWidget {
         return Stack(
           children: [
             ListView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               padding: const EdgeInsets.only(bottom: 100),
               children: [
                 // ── Seção: Missões de Hoje ──────────────────────────────
@@ -291,6 +296,7 @@ class _TasksPage extends StatelessWidget {
                 ],
 
                 const SizedBox(height: 16),
+                const AdBannerPlaceholder(),
               ],
             ),
             if (vm.isLoading)
@@ -502,6 +508,7 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return SafeArea(
       child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         child: Container(
           margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
           padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
@@ -655,6 +662,32 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class AdBannerPlaceholder extends StatelessWidget {
+  const AdBannerPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.cardBorder.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        'Espaço Reservado para Foco',
+        style: GoogleFonts.inter(
+          color: AppColors.textTertiary,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
