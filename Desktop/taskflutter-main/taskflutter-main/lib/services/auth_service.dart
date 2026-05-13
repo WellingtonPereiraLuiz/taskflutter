@@ -2,114 +2,136 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 // ===========================================================================
-// ATENÇÃO AO DESENVOLVEDOR — LEIA ANTES DE USAR ESTE SERVIÇO
-// ===========================================================================
+// AuthService — Serviço de Autenticação com Google Sign-In via Firebase Auth
 //
-// O Google Sign-In NÃO FUNCIONA sem configuração Firebase.
-// Para ativar a autenticação real, siga estes passos:
+// Arquitetura (testável):
+//   - GoogleSignInClient é uma abstração nossa. Ela retorna [GoogleIdTokenResult],
+//     um DTO simples com apenas o idToken — sem dependências do SDK do Google.
+//   - Isso permite mockar 100% sem depender dos tipos internos do google_sign_in.
+//   - Para testes: AuthService.withDependencies(mockAuth, mockGsiClient)
+//   - Para produção: AuthService() → usa RealGoogleSignInClient com o SDK real.
 //
-//  1. Criar um projeto no Firebase Console: https://console.firebase.google.com
-//  2. Adicionar o app Android ao projeto Firebase.
-//  3. Baixar google-services.json e colocar em android/app/
-//  4. Obter o SHA-1 do seu keystore de debug:
-//       keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey
-//  5. Registrar o SHA-1 no Firebase Console → Configurações do Projeto → SHA
-//  6. Rodar: flutterfire configure
-//  7. Importar o firebase_options.dart gerado em lib/firebase_options.dart
-//  8. Habilitar "Google" em Firebase → Authentication → Sign-in methods
-//
-// NOTA: google_sign_in 7.x mudou a API.
-//   - Não se usa mais o construtor GoogleSignIn()
-//   - Use GoogleSignIn.instance + initialize() + authenticate()
-//   - O accessToken agora requer authorizeScopes() separado
-//
-// SEM ESSAS ETAPAS, signInWithGoogle() vai retornar null.
+// Fluxo (google_sign_in v7):
+//   1. GoogleSignIn.instance.initialize()
+//   2. GoogleSignIn.instance.authenticate()
+//   3. account.authentication.idToken
+//   4. GoogleAuthProvider.credential(idToken: ...)
+//   5. FirebaseAuth.signInWithCredential(credential)
 // ===========================================================================
 
-class AuthService {
-  static final AuthService _instance = AuthService._internal();
-  factory AuthService() => _instance;
-  AuthService._internal();
+/// DTO simples com apenas o idToken retornado pelo Google.
+/// Desacopla os testes dos tipos internos do google_sign_in SDK.
+class GoogleIdTokenResult {
+  final String? idToken;
+  const GoogleIdTokenResult({required this.idToken});
+}
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+/// Interface da camada Google Sign-In — completamente testável.
+abstract class GoogleSignInClient {
+  Future<void> initialize();
+
+  /// Autentica com Google e retorna um [GoogleIdTokenResult].
+  /// Lança PlatformException se o usuário cancelar.
+  Future<GoogleIdTokenResult> getIdToken();
+
+  Future<void> signOut();
+}
+
+/// Implementação real que delega para GoogleSignIn.instance (SDK v7).
+class RealGoogleSignInClient implements GoogleSignInClient {
   bool _initialized = false;
 
-  /// Stream do estado de autenticação do usuário.
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-
-  /// Usuário atualmente autenticado (null se não logado).
-  User? get currentUser => _firebaseAuth.currentUser;
-
-  /// Retorna true se já existe uma sessão ativa.
-  bool get isLoggedIn => currentUser != null;
-
-  /// Inicializa o GoogleSignIn (chamar uma vez antes de autenticar).
-  Future<void> _ensureInitialized() async {
+  @override
+  Future<void> initialize() async {
     if (_initialized) return;
-    try {
-      // google_sign_in v7: deve chamar initialize() antes de authenticate()
-      await GoogleSignIn.instance.initialize();
-      _initialized = true;
-    } catch (e) {
-      // Firebase não configurado — inicialização falha silenciosamente
-      // ignore: avoid_print
-      print('[AuthService] GoogleSignIn.initialize failed: $e');
-    }
+    await GoogleSignIn.instance.initialize();
+    _initialized = true;
   }
 
-  /// Realiza o login com Google.
-  /// Retorna [User] em caso de sucesso, ou null se cancelado/não configurado.
+  @override
+  Future<GoogleIdTokenResult> getIdToken() async {
+    final account = await GoogleSignIn.instance.authenticate();
+    return GoogleIdTokenResult(idToken: account.authentication.idToken);
+  }
+
+  @override
+  Future<void> signOut() => GoogleSignIn.instance.signOut();
+}
+
+// ─── AuthService ─────────────────────────────────────────────────────────────
+
+class AuthService {
+  // ── Singleton de produção ────────────────────────────────────────────────
+  static final AuthService _instance = AuthService._production();
+  factory AuthService() => _instance;
+
+  // ── Dependências injetáveis ──────────────────────────────────────────────
+  final FirebaseAuth _firebaseAuth;
+  final GoogleSignInClient _googleSignInClient;
+
+  /// Construtor de produção — usa instâncias reais do Firebase/Google.
+  AuthService._production()
+      : _firebaseAuth = FirebaseAuth.instance,
+        _googleSignInClient = RealGoogleSignInClient();
+
+  /// Construtor para testes — permite injetar mocks.
+  AuthService.withDependencies(this._firebaseAuth, this._googleSignInClient);
+
+  // ── Getters ──────────────────────────────────────────────────────────────
+
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  User? get currentUser => _firebaseAuth.currentUser;
+  bool get isLoggedIn => currentUser != null;
+
+  // ── Métodos ──────────────────────────────────────────────────────────────
+
+  /// Realiza o login com Google via Firebase Auth.
+  /// Retorna [User] em sucesso, null em caso de cancelamento ou erro.
   Future<User?> signInWithGoogle() async {
     try {
-      await _ensureInitialized();
+      // Inicializa o cliente Google (idempotente)
+      await _googleSignInClient.initialize();
 
-      // google_sign_in v7: authenticate() substitui signIn()
-      final GoogleSignInAccount googleUser =
-          await GoogleSignIn.instance.authenticate();
-
-      // Obtém apenas o idToken (accessToken requer authorizeScopes em v7)
-      final googleAuth = googleUser.authentication;
-      final idToken = googleAuth.idToken;
+      // Obtém o idToken do Google
+      final tokenResult = await _googleSignInClient.getIdToken();
+      final idToken = tokenResult.idToken;
 
       if (idToken == null) {
         // ignore: avoid_print
-        print('[AuthService] idToken is null — Firebase não configurado?');
+        print('[AuthService] idToken nulo — verifique a configuração Firebase.');
         return null;
       }
 
-      // Cria credencial Firebase com apenas o idToken
+      // Cria credencial Firebase
       final credential = GoogleAuthProvider.credential(idToken: idToken);
 
       // Autentica no Firebase
-      final UserCredential userCredential =
+      final userCredential =
           await _firebaseAuth.signInWithCredential(credential);
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      // ERROS COMUNS:
-      // • sign_in_failed: Firebase não configurado (google-services.json faltando)
-      // • network_error: Sem conexão
       // ignore: avoid_print
-      print('[AuthService] FirebaseAuthException: ${e.code} — ${e.message}');
+      print('[AuthService] FirebaseAuthException ${e.code}: ${e.message}');
       return null;
     } catch (e) {
-      // Captura qualquer outro erro inesperado (incluindo cancelamento pelo usuário)
+      // Captura PlatformException (cancelamento) e outros erros inesperados
       // ignore: avoid_print
-      print('[AuthService] Unexpected error during sign-in: $e');
+      print('[AuthService] Erro inesperado no login: $e');
       return null;
     }
   }
 
-  /// Realiza o logout do usuário.
+  /// Realiza o logout do usuário (Firebase + Google).
   Future<void> signOut() async {
     try {
       await Future.wait([
         _firebaseAuth.signOut(),
-        GoogleSignIn.instance.signOut(),
+        _googleSignInClient.signOut(),
       ]);
     } catch (e) {
       // ignore: avoid_print
-      print('[AuthService] Error during sign-out: $e');
+      print('[AuthService] Erro no logout: $e');
     }
   }
 }

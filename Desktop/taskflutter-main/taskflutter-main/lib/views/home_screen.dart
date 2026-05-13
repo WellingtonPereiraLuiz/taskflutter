@@ -28,11 +28,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openAddTaskModal(BuildContext context) {
+    final vm = context.read<TaskViewModel>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => const _AddTaskSheet(),
+      builder: (ctx) => ChangeNotifierProvider<TaskViewModel>.value(
+        value: vm,
+        child: const _AddTaskSheet(),
+      ),
     );
   }
 
