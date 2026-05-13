@@ -248,12 +248,14 @@ class _LoginScreenState extends State<LoginScreen>
             children: [
               Text(f.$1, style: const TextStyle(fontSize: 22)),
               const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(f.$2, style: GoogleFonts.inter(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                  Text(f.$3, style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.45), fontSize: 11)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(f.$2, style: GoogleFonts.inter(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                    Text(f.$3, style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.45), fontSize: 11)),
+                  ],
+                ),
               ),
             ],
           ),

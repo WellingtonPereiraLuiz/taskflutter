@@ -141,7 +141,10 @@ class _TaskCardState extends State<TaskCard>
                             ),
                           ],
                           const SizedBox(height: 8),
-                          Row(
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               // Category badge
                               Container(
@@ -160,22 +163,25 @@ class _TaskCardState extends State<TaskCard>
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 12,
-                                color: AppColors.textTertiary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                dateFormatted,
-                                style: const TextStyle(
-                                  color: AppColors.textTertiary,
-                                  fontSize: 11,
-                                ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.access_time_rounded,
+                                    size: 12,
+                                    color: AppColors.textTertiary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    dateFormatted,
+                                    style: const TextStyle(
+                                      color: AppColors.textTertiary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
                               ),
                               if (task.isCompleted) ...[
-                                const SizedBox(width: 8),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 6, vertical: 2),
